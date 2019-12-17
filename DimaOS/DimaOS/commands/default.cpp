@@ -22,4 +22,8 @@ void set_default_commands() {
 	GV::cmds["clear"] = [](std::vector<string> args) {
 		system("cls");
 	};
+
+	GV::cmds["help"] = [](std::vector<string> args) {
+		cout << "this is help" << endl;
+	};
 }
