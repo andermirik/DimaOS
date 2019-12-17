@@ -13,8 +13,8 @@ namespace core {
 
 	uint64_t fsize(int inode_number);                                            
 	
-	LazyOS::inode fget_attributes(int inode_number);
-	int fset_attributes(int inode_number, LazyOS::inode& inode);
+	DimaOS::inode fget_attributes(int inode_number);
+	int fset_attributes(int inode_number, DimaOS::inode& inode);
 
 	int frename(std::string filename, std::string new_filename);
 }

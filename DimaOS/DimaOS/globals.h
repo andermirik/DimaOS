@@ -13,6 +13,6 @@ void set_commands();
 
 class GV {
 public:
-	static LazyOS os;
+	static DimaOS os;
 	static std::map<std::string, std::function<void(std::vector<std::string>)>> cmds;
 };

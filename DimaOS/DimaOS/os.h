@@ -4,7 +4,7 @@ using byte = unsigned char;
 #include <fstream>
 #include <vector>
 
-class LazyOS {
+class DimaOS {
 public:
 	struct inode;
 	struct super_block;
@@ -85,8 +85,8 @@ public:
 	int group_join(std::string name, std::string pswd);
 	
 
-	LazyOS();
-	~LazyOS();
+	DimaOS();
+	~DimaOS();
 	int resize(int size, int size_claster);
 
 	void set_bit_0(int bit_number);

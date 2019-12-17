@@ -25,10 +25,10 @@ void set_filesystem_commands() {
 		if (bytes_readed >= 0) {
 
 			for (int i = 0; i < size / 64; i++) {
-				LazyOS::file_in_root file;
+				DimaOS::file_in_root file;
 				memcpy(&file, buf + i * 64, 64);
 
-				LazyOS::inode inode = GV::os.read_inode(file.n_inode);
+				DimaOS::inode inode = GV::os.read_inode(file.n_inode);
 				auto attrs = core::fget_attributes(file.n_inode);
 				uint16_t type = util::read_first_4_bits(attrs.mode);
 				uint16_t rules = util::read_rwxrwxrwx(attrs.mode);
@@ -88,7 +88,7 @@ void set_filesystem_commands() {
 		if (bytes_readed >= 0) {
 
 			for (int i = 0; i < size / 64; i++) {
-				LazyOS::file_in_root file;
+				DimaOS::file_in_root file;
 				memcpy(&file, buf + i * 64, 64);
 
 				auto attrs = core::fget_attributes(file.n_inode);

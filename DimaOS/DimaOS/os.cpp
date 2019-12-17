@@ -6,24 +6,24 @@
 using std::string;
 
 
-std::string LazyOS::relative_to_full_path(std::string path)
+std::string DimaOS::relative_to_full_path(std::string path)
 {
 	return path;
 }
 
-void LazyOS::sudo()
+void DimaOS::sudo()
 {
 	sudo_temp_user = GV::os.current_user;
-	GV::os.current_user = LazyOS::user(0, "root", "");
+	GV::os.current_user = DimaOS::user(0, "root", "");
 	GV::os.current_user.gid = 0;
 }
 
-void LazyOS::suend()
+void DimaOS::suend()
 {
 	GV::os.current_user = sudo_temp_user;
 }
 
-std::vector<std::tuple<uint32_t, uint32_t, std::string>> LazyOS::user_get()
+std::vector<std::tuple<uint32_t, uint32_t, std::string>> DimaOS::user_get()
 {
 	std::vector<std::tuple<uint32_t, uint32_t, std::string>> users;
 
@@ -39,7 +39,7 @@ std::vector<std::tuple<uint32_t, uint32_t, std::string>> LazyOS::user_get()
 
 	return users;
 }
-int LazyOS::user_login(std::string login, std::string pswd)
+int DimaOS::user_login(std::string login, std::string pswd)
 {
 	pswd = util::stupid_hash(pswd);
 
@@ -55,7 +55,7 @@ int LazyOS::user_login(std::string login, std::string pswd)
 	}
 	return -1;
 }
-int LazyOS::user_add(std::string login, std::string pswd)
+int DimaOS::user_add(std::string login, std::string pswd)
 {
 	pswd = util::stupid_hash(pswd);
 	int inode_number = core::fopen("users");
@@ -81,7 +81,7 @@ int LazyOS::user_add(std::string login, std::string pswd)
 
 	return write_user.uid;
 }
-int LazyOS::user_del(std::string login)
+int DimaOS::user_del(std::string login)
 {
 	int inode_number = core::fopen("users");
 	int size = core::fsize(inode_number);
@@ -101,7 +101,7 @@ int LazyOS::user_del(std::string login)
 
 	return -1;
 }
-int LazyOS::user_rnm(std::string login, std::string new_login)
+int DimaOS::user_rnm(std::string login, std::string new_login)
 {
 	int inode_number = core::fopen("users");
 	int size = core::fsize(inode_number);
@@ -126,7 +126,7 @@ int LazyOS::user_rnm(std::string login, std::string new_login)
 
 	return -1;
 }
-int LazyOS::user_pswd(std::string login, std::string new_pswd)
+int DimaOS::user_pswd(std::string login, std::string new_pswd)
 {
 	new_pswd = util::stupid_hash(new_pswd);
 	int inode_number = core::fopen("users");
@@ -147,20 +147,20 @@ int LazyOS::user_pswd(std::string login, std::string new_pswd)
 	return -1;
 }
 
-LazyOS::user LazyOS::user_read(int user_number)
+DimaOS::user DimaOS::user_read(int user_number)
 {
 	user ret;
 	int inode_number = core::fopen("users");
 	core::fread(inode_number, user_number * 64, 64, (char*)&ret);
 	return ret;
 }
-void LazyOS::user_write(int user_number, user& u)
+void DimaOS::user_write(int user_number, user& u)
 {
 	int inode_number = core::fopen("users");
 	core::fwrite(inode_number, user_number * 64, 64, (char*)&u);
 }
 
-std::vector<std::tuple<uint32_t, uint32_t, std::string>> LazyOS::group_get()
+std::vector<std::tuple<uint32_t, uint32_t, std::string>> DimaOS::group_get()
 {
 	std::vector<std::tuple<uint32_t, uint32_t, std::string>> users;
 
@@ -175,7 +175,7 @@ std::vector<std::tuple<uint32_t, uint32_t, std::string>> LazyOS::group_get()
 
 	return users;
 }
-int LazyOS::group_add(std::string name, std::string pswd)
+int DimaOS::group_add(std::string name, std::string pswd)
 {
 	pswd = util::stupid_hash(pswd);
 	if (sudo_temp_user.gid == 0xFFFFFFFF || sudo_temp_user.uid == 0) {
@@ -206,7 +206,7 @@ int LazyOS::group_add(std::string name, std::string pswd)
 		return -1;
 	}
 }
-int LazyOS::group_del(std::string name, std::string pswd)
+int DimaOS::group_del(std::string name, std::string pswd)
 {
 	pswd = util::stupid_hash(pswd);
 	int inode_number = core::fopen("groups");
@@ -229,7 +229,7 @@ int LazyOS::group_del(std::string name, std::string pswd)
 	return -1;
 }
 
-int LazyOS::group_rename(std::string name, std::string pswd, std::string new_name)
+int DimaOS::group_rename(std::string name, std::string pswd, std::string new_name)
 {
 	pswd = util::stupid_hash(pswd);
 	int inode_number = core::fopen("groups");
@@ -252,7 +252,7 @@ int LazyOS::group_rename(std::string name, std::string pswd, std::string new_nam
 	return -1;
 }
 
-int LazyOS::group_pswd(std::string name, std::string pswd, std::string new_pswd)
+int DimaOS::group_pswd(std::string name, std::string pswd, std::string new_pswd)
 {
 	pswd = util::stupid_hash(pswd);
 	int inode_number = core::fopen("groups");
@@ -275,7 +275,7 @@ int LazyOS::group_pswd(std::string name, std::string pswd, std::string new_pswd)
 	return -1;
 }
 
-int LazyOS::group_leave()
+int DimaOS::group_leave()
 {
 	if (sudo_temp_user.uid != 0) {
 		GV::os.sudo_temp_user.gid = 0xFFFFFFFF;
@@ -284,7 +284,7 @@ int LazyOS::group_leave()
 	return 0;
 }
 
-int LazyOS::group_join(std::string name, std::string pswd)
+int DimaOS::group_join(std::string name, std::string pswd)
 {
 	pswd = util::stupid_hash(pswd);
 	int inode_number = core::fopen("groups");
@@ -309,18 +309,18 @@ int LazyOS::group_join(std::string name, std::string pswd)
 
 
 
-LazyOS::LazyOS()
+DimaOS::DimaOS()
 {
 	file.open("filesystem.dat", std::ios::in | std::ios::out | std::ios::binary);
 	superblock = read_super_block();
 }
 
-LazyOS::~LazyOS()
+DimaOS::~DimaOS()
 {
 	file.close();
 }
 
-int LazyOS::resize(int size, int size_claster)
+int DimaOS::resize(int size, int size_claster)
 {
 	file.close();
 	std::remove("filesystem.dat");
@@ -338,7 +338,11 @@ int LazyOS::resize(int size, int size_claster)
 	sb.inode_blocks = 20000;
 	sb.root_inode = 0;
 
+
 	write_super_block(sb);
+	
+	superblock = read_super_block();
+
 	int i = 0;
 	for (i = 0; i < 256 +1; i++) { //+1 инод рута
 		set_bit(i, 0x1);
@@ -361,7 +365,7 @@ int LazyOS::resize(int size, int size_claster)
 	core::fcreate("file4");
 	core::fcreate("file5");
 	core::fcreate("file6");
-//	core::fcreate("file7");
+	core::fcreate("file7");
 	//core::fcreate("file8");
 
 	user_add("ghost", "");
@@ -374,7 +378,7 @@ int LazyOS::resize(int size, int size_claster)
 
 
 
-void LazyOS::set_bit(int n, byte value, int offset)
+void DimaOS::set_bit(int n, byte value, int offset)
 {
 	if (value == 0)
 		set_bit_0(n+offset);
@@ -382,7 +386,7 @@ void LazyOS::set_bit(int n, byte value, int offset)
 		set_bit_1(n+offset);
 }
 
-void LazyOS::set_bit_1(int bit_number)
+void DimaOS::set_bit_1(int bit_number)
 {
 	static char buf[512];
 	bios_read_sector(bit_number >> 12, buf);
@@ -390,7 +394,7 @@ void LazyOS::set_bit_1(int bit_number)
 	bios_write_sector(bit_number >> 12, buf);
 }
 
-void LazyOS::set_bit_0(int bit_number)
+void DimaOS::set_bit_0(int bit_number)
 {
 	static char buf[512];
 	bios_read_sector(bit_number >> 12, buf);
@@ -398,7 +402,7 @@ void LazyOS::set_bit_0(int bit_number)
 	bios_write_sector(bit_number >> 12, buf);
 }
 
-int LazyOS::get_bit(int bit_number, int offset)
+int DimaOS::get_bit(int bit_number, int offset)
 {
 	bit_number += offset;
 	static char buf[512];
@@ -406,14 +410,14 @@ int LazyOS::get_bit(int bit_number, int offset)
 	return (buf[(bit_number & 4095) >> 3] >> (bit_number & 7)) & 1;
 }
 
-int LazyOS::bios_read_sector(int sector_number, char buf[512])
+int DimaOS::bios_read_sector(int sector_number, char buf[512])
 {
 	file.seekg(sector_number << 9);
 	file.read(buf, 512);
 	return 0;
 }
 
-int LazyOS::bios_write_sector(int sector_number, char buf[512])
+int DimaOS::bios_write_sector(int sector_number, char buf[512])
 {
 	file.seekp(sector_number << 9);
 	file.write(buf, 512);
@@ -421,13 +425,13 @@ int LazyOS::bios_write_sector(int sector_number, char buf[512])
 }
 
 //max = 20000
-void LazyOS::write_inode(int inode_number, inode & input)
+void DimaOS::write_inode(int inode_number, inode & input)
 {
 	file.seekp(256 * 512 + inode_number * sizeof(inode));
 	file.write((char*)&input, sizeof(inode));
 }
 
-LazyOS::inode LazyOS::read_inode(int inode_number)
+DimaOS::inode DimaOS::read_inode(int inode_number)
 {
 	inode result;
 	file.seekg(256 * 512 + inode_number * sizeof(inode));
@@ -435,7 +439,7 @@ LazyOS::inode LazyOS::read_inode(int inode_number)
 	return result;
 }
 
-void LazyOS::write_super_block(super_block & block)
+void DimaOS::write_super_block(super_block & block)
 {
 	char buf[512];
 	bios_read_sector(0, buf);
@@ -443,7 +447,7 @@ void LazyOS::write_super_block(super_block & block)
 	bios_write_sector(0, buf);
 }
 
-LazyOS::super_block LazyOS::read_super_block()
+DimaOS::super_block DimaOS::read_super_block()
 {
 	super_block result;
 	char buf[512];
@@ -452,7 +456,7 @@ LazyOS::super_block LazyOS::read_super_block()
 	return result;
 }
 
-uint32_t LazyOS::get_free_block()
+uint32_t DimaOS::get_free_block()
 {
 	for (int i = 4023; i < superblock.bitmap_size*8; i++) {
 		if (get_bit(i) != 1) {
@@ -462,7 +466,7 @@ uint32_t LazyOS::get_free_block()
 	return 0;
 }
 
-uint32_t LazyOS::get_free_inode()
+uint32_t DimaOS::get_free_inode()
 {
 	for (int i = 256; i < 4006; i++) {
 		if (get_bit(i) != 1) {
@@ -472,7 +476,7 @@ uint32_t LazyOS::get_free_inode()
 	return 0;
 }
 
-void LazyOS::read_block_indirect(inode & inode, int block_number, char buf[512])
+void DimaOS::read_block_indirect(inode & inode, int block_number, char buf[512])
 {   
 	//0 indirect [0 - 11]
 	if (block_number < 12) {
@@ -543,7 +547,7 @@ void LazyOS::read_block_indirect(inode & inode, int block_number, char buf[512])
 	}
 }
 
-void LazyOS::write_block_indirect(inode & inode, int block_number, char buf[512])
+void DimaOS::write_block_indirect(inode & inode, int block_number, char buf[512])
 {
 	//0 indirect [0 - 11]
 	if (block_number < 12) {
@@ -614,17 +618,17 @@ void LazyOS::write_block_indirect(inode & inode, int block_number, char buf[512]
 	}
 }
 
-void LazyOS::lock_inode(int inode_number)
+void DimaOS::lock_inode(int inode_number)
 {
 	set_bit(256 + inode_number, 0x1);
 }
 
-void LazyOS::unlock_inode(int inode_number)
+void DimaOS::unlock_inode(int inode_number)
 {
 	set_bit(256 + inode_number, 0x0);
 }
 
-void LazyOS::free_inode_blocks(int inode_number)
+void DimaOS::free_inode_blocks(int inode_number)
 {
 	auto inode = read_inode(inode_number);
 	for (int i = 0; i < 12; i++) {

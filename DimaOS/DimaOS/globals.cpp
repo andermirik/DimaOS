@@ -1,6 +1,6 @@
 #include "globals.h"
 
-LazyOS GV::os;
+DimaOS GV::os;
 std::map<std::string, std::function<void(std::vector<std::string>)>> GV::cmds;
 
 void set_commands()

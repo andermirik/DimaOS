@@ -146,7 +146,7 @@ void set_users_commands() {
 					GV::os.sudo();
 					auto [_uid, _gid, _login] = GV::os.user_get()[uid];
 					GV::os.suend();
-					GV::os.current_user = LazyOS::user(uid, login, pswd);
+					GV::os.current_user = DimaOS::user(uid, login, pswd);
 					GV::os.current_user.gid = _gid;
 				}
 				else {

@@ -41,7 +41,7 @@ int main() {
 
 #if 1
 	GV::cmds["init"]({});//тут удалить
-	GV::os.current_user = LazyOS::user();
+	GV::os.current_user = DimaOS::user();
 #endif
 
 	auto root = GV::os.read_inode(0);
