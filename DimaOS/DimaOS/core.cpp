@@ -86,7 +86,7 @@ int open_file(int inode_number, DimaOS::inode& inode, std::string filename) {
 		if (i % 8 == 0)
 			GV::os.read_block_indirect(inode, i/8, buf);
 		DimaOS::file_in_root file;
-		memcpy(&file, buf + i * sizeof(DimaOS::file_in_root), sizeof(DimaOS::file_in_root));
+		memcpy(&file, buf + (i % 8) * sizeof(DimaOS::file_in_root), sizeof(DimaOS::file_in_root));
 		if (filename == util::file_to_filename(file)) {
 			return file.n_inode;
 		}
