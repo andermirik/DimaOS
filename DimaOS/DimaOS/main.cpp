@@ -39,10 +39,16 @@ int main() {
 	0 - не рестартить
 	*/
 
-#if 0
-	GV::cmds["init"]({});
+#if 1
+	GV::cmds["init"]({});//тут удалить
 	GV::os.current_user = LazyOS::user();
 #endif
+
+	auto root = GV::os.read_inode(0);
+	char buf[512];
+	char buf2[512];
+	GV::os.read_block_indirect(root, 0, buf);
+	GV::os.read_block_indirect(root, 1, buf2);
 
 	GV::cmds["users"]({ "login" });
 	if (std::string(GV::os.current_user.login) == ""){
@@ -50,15 +56,12 @@ int main() {
 		return 0;
 	}
 
-	GV::os.dirs = util::split("/", '/');
-
 	string line;
 	while (true) {
 		
 		cout << GV::os.current_user.login;
 		cout << "$ ";
 		std::getline(std::cin, line);
-
 
 		auto[command, args] = parse_line(line);
 		

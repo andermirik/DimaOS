@@ -8,13 +8,11 @@ class LazyOS {
 public:
 	struct inode;
 	struct super_block;
-	struct directory_file;
+	struct file_in_root;
 	struct user;
 private:
 	std::fstream file;
 public:
-	
-	std::vector<std::string> dirs;
 
 	std::string relative_to_full_path(std::string path);
 	void sudo();
@@ -152,12 +150,12 @@ public:
 		uint64_t date_modification;
 	};
 
-	struct directory_file {
+	struct file_in_root {
 		uint32_t n_inode;
 		char filename[54];
 		char extension[6];
 
-		directory_file() {
+		file_in_root() {
 			this->n_inode = 0;
 			char filename[54] = { 0 };
 			char extension[6] = { 0 };
@@ -165,7 +163,7 @@ public:
 			memcpy(this->extension, extension, 6);
 		};
 
-		directory_file(uint32_t n_inode, std::string filename) {
+		file_in_root(uint32_t n_inode, std::string filename) {
 			this->n_inode = n_inode;
 
 			char f[54] = { 0 };

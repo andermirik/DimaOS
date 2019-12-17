@@ -10,10 +10,9 @@ int create_file(int inode_number, LazyOS::inode& inode, LazyOS::inode& new_inode
 	auto now = std::chrono::system_clock::now();
 	uint32_t free_inode = GV::os.get_free_inode();
 
-	LazyOS::directory_file files[8];
-	LazyOS::directory_file file(free_inode, filename);
-	GV::os.read_block_indirect(inode, inode.size / 512, buf);
-
+	LazyOS::file_in_root files[8];
+	LazyOS::file_in_root file(free_inode, filename);
+	GV::os.read_block_indirect(inode, inode.size / 512, buf);    //4007
 	memcpy(files, buf, 512);
 	for (int i = 0; i < 8; i++)
 		if (util::file_to_filename(files[i]) == filename) {
@@ -45,6 +44,7 @@ int core::fcreate(std::string filename)
 	if (filename == "/") { //root
 		LazyOS::inode inode = {0};//20000
 		inode.mode = util::write_first_4_bits(inode.mode, 0x5D);
+		inode.mode = util::write_rwxrwxrwx(inode.mode, 0777);
 		inode.date_creation = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
 		inode.date_modification = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
 		inode.size = 0;//8192
@@ -85,8 +85,8 @@ int open_file(int inode_number, LazyOS::inode& inode, std::string filename) {
 	for (int i = 0; i < inode.size / 64; i++) {
 		if (i % 8 == 0)
 			GV::os.read_block_indirect(inode, i/8, buf);
-		LazyOS::directory_file file;
-		memcpy(&file, buf + i * sizeof(LazyOS::directory_file), sizeof(LazyOS::directory_file));
+		LazyOS::file_in_root file;
+		memcpy(&file, buf + i * sizeof(LazyOS::file_in_root), sizeof(LazyOS::file_in_root));
 		if (filename == util::file_to_filename(file)) {
 			return file.n_inode;
 		}
@@ -107,15 +107,14 @@ int delete_file(int inode_number, LazyOS::inode& inode, std::string filename) {
 	if (inode.size == 0)
 		return 0;
 
-	
 	uint32_t uid = GV::os.current_user.uid;
 	uint32_t gid = GV::os.current_user.gid;
 
 	//take last file
 	GV::os.read_block_indirect(inode, inode.size / 512, buf);
-	LazyOS::directory_file files[8];
+	LazyOS::file_in_root files[8];
 	memcpy(files, buf, 512);
-	LazyOS::directory_file last_file;
+	LazyOS::file_in_root last_file;
 	last_file = files[inode.size / 64 - 1];
 
 	if (util::file_to_filename(last_file) == filename) {//is last file
@@ -124,7 +123,7 @@ int delete_file(int inode_number, LazyOS::inode& inode, std::string filename) {
 		std::bitset<9> rwx(util::read_rwxrwxrwx(to_del_inode.mode));
 		if (uid == 0 || gid == 0 || (rwx[7] && uid == to_del_inode.uid) || (rwx[4] && gid == to_del_inode.gid && gid != 0xFFFFFFFF) || rwx[1]) {
 			LazyOS::inode a = GV::os.read_inode(files[inode.size / 64 - 1].n_inode);
-			files[inode.size / 64 - 1] = LazyOS::directory_file();
+			files[inode.size / 64 - 1] = LazyOS::file_in_root();
 			memcpy(buf, files, 512);
 			inode.size -= 64;
 
@@ -140,13 +139,13 @@ int delete_file(int inode_number, LazyOS::inode& inode, std::string filename) {
 		for (int i = 0; i < inode.size / 64; i++) {
 			if (i % 8 == 0)
 				GV::os.read_block_indirect(inode, i / 8, buf);
-			LazyOS::directory_file file;
-			memcpy(&file, buf + i * sizeof(LazyOS::directory_file), sizeof(LazyOS::directory_file));
+			LazyOS::file_in_root file;
+			memcpy(&file, buf + i * sizeof(LazyOS::file_in_root), sizeof(LazyOS::file_in_root));
 			if (filename == util::file_to_filename(file)) { //swap files
 				LazyOS::inode to_del_inode = GV::os.read_inode(files[i % 8].n_inode);
 				std::bitset<9> rwx(util::read_rwxrwxrwx(to_del_inode.mode));
 				if (uid == 0 || gid == 0 || (rwx[7] && uid == to_del_inode.uid) || (rwx[4] && gid == to_del_inode.gid && gid != 0xFFFFFFFF) || rwx[1]) {
-					files[inode.size / 64 - 1] = LazyOS::directory_file();
+					files[inode.size / 64 - 1] = LazyOS::file_in_root();
 					memcpy(buf, files, 512);
 					GV::os.write_block_indirect(inode, inode.size / 512, buf);
 
@@ -321,12 +320,12 @@ int rename_file(int inode_number, LazyOS::inode& inode, std::vector<std::string>
 	for (int i = 0; i < inode.size / 64; i++) {
 		if (i % 8 == 0)
 			GV::os.read_block_indirect(inode, i / 8, buf);
-		LazyOS::directory_file file;
-		memcpy(&file, buf + i * sizeof(LazyOS::directory_file), sizeof(LazyOS::directory_file));
+		LazyOS::file_in_root file;
+		memcpy(&file, buf + i * sizeof(LazyOS::file_in_root), sizeof(LazyOS::file_in_root));
 		if (dirs[k] == util::file_to_filename(file)) {
 			if (k == dirs.size() - 2) {
-				LazyOS::directory_file new_file(file.n_inode, new_filename);
-				memcpy(buf + i * sizeof(LazyOS::directory_file), &new_file, sizeof(LazyOS::directory_file));
+				LazyOS::file_in_root new_file(file.n_inode, new_filename);
+				memcpy(buf + i * sizeof(LazyOS::file_in_root), &new_file, sizeof(LazyOS::file_in_root));
 				GV::os.write_block_indirect(inode, i / 8, buf);
 				return 1;
 			}

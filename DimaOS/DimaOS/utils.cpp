@@ -40,7 +40,7 @@ namespace util {
 		return str;
 	}
 
-	std::string file_to_filename(LazyOS::directory_file& file) {
+	std::string file_to_filename(LazyOS::file_in_root& file) {
 		std::string tmp;
 		tmp.append(file.filename);
 		if (strlen(file.extension) != 0) {

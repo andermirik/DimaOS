@@ -11,8 +11,6 @@ using std::cout;
 using std::cin;
 using std::endl;
 
-
-
 std::string long_to_time(uint64_t ltime) {
 	time_t ttime = (time_t)ltime/1000;
 	return std::string(ctime(&ttime));
@@ -20,21 +18,14 @@ std::string long_to_time(uint64_t ltime) {
 
 void set_filesystem_commands() {
 	GV::cmds["ls"] = [](std::vector<std::string> args) {
-		if (args.empty()) {
-			args.push_back(util::join(GV::os.dirs, "/"));
-		}
-		int file_inode = core::fopen(args[0]);
-		if (file_inode == 0 && args[0] != "/") {
-			cout << "такого файла не существует!" << endl;
-			return;
-		}
+		int file_inode = core::fopen("/");
 		int size = core::fsize(file_inode);
 		char* buf = new char[size];
 		int bytes_readed = core::fread(file_inode, 0, size, buf);
 		if (bytes_readed >= 0) {
 
 			for (int i = 0; i < size / 64; i++) {
-				LazyOS::directory_file file;
+				LazyOS::file_in_root file;
 				memcpy(&file, buf + i * 64, 64);
 
 				LazyOS::inode inode = GV::os.read_inode(file.n_inode);
@@ -88,14 +79,8 @@ void set_filesystem_commands() {
 		}
 	};
 	GV::cmds["dir"] = [](std::vector<std::string> args) {
-		if (args.empty()) {
-			args.push_back(util::join(GV::os.dirs, "/"));
-		}
-		int file_inode = core::fopen(args[0]);
-		if (file_inode == 0 && args[0] != "/") {
-			cout << "такого файла не существует!" << endl;
-			return;
-		}
+		
+		int file_inode = core::fopen("/");
 		int size = core::fsize(file_inode);
 		char* buf = new char[size];
 
@@ -103,7 +88,7 @@ void set_filesystem_commands() {
 		if (bytes_readed >= 0) {
 
 			for (int i = 0; i < size / 64; i++) {
-				LazyOS::directory_file file;
+				LazyOS::file_in_root file;
 				memcpy(&file, buf + i * 64, 64);
 
 				auto attrs = core::fget_attributes(file.n_inode);
@@ -125,32 +110,7 @@ void set_filesystem_commands() {
 			cout << "недостаточно прав!" << endl;
 		}
 	};
-	GV::cmds["cd"] = [](std::vector<std::string> args) {
-		if (!args.empty()) {
-			if (args[0] == "") {
-				return;
-			}
-			
-			string path = GV::os.relative_to_full_path(args[0]);
-
-			int file_inode = core::fopen(path);
-			auto attrs = core::fget_attributes(file_inode);
-			int file_type = util::read_first_4_bits(attrs.mode);
-			bool is_dir = file_type == 0xD || file_type == 0x5D;
-			
-			if ((file_inode || path == "/") && is_dir == true) {
-				GV::os.dirs = util::split(path, '/');
-				if (file_inode != 0) {
-					if (path[path.size()-1] != '/') {
-						GV::os.dirs.push_back("");
-					}
-				}
-			}
-			else {
-				cout << "не удалось открыть файл " << path << endl;
-			}
-		}
-	};
+	
 	GV::cmds["mk"] = [](std::vector<std::string> args) {
 		if (!args.empty()) {
 			string path = GV::os.relative_to_full_path(args[0]);
