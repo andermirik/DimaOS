@@ -198,6 +198,7 @@ int DimaOS::group_add(std::string name, std::string pswd)
 
 		sudo_temp_user = user_read(sudo_temp_user.uid);
 		sudo_temp_user.gid = write_group.gid;
+
 		user_write(sudo_temp_user.uid, sudo_temp_user);
 
 		return write_group.gid;
