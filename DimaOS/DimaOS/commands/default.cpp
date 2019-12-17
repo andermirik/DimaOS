@@ -24,6 +24,28 @@ void set_default_commands() {
 	};
 
 	GV::cmds["help"] = [](std::vector<string> args) {
-		cout << "this is help" << endl;
+		cout << "Вспомогательное меню помощи DimaOS" << endl
+			<< "groups - все команды для группы" << endl
+			<< "users - команды для пользователя" << endl
+			<< "ls - дополнительная информация файлов" << endl
+			<< "dir - просмотреть имена файлов " << endl
+			<< "mk - создать файл" << endl
+			<< "rm - удалить файл" << endl
+			<< "mv - переместить файл" << endl
+			<< "cp - копировать файл" << endl
+			<< "append - добавить в конец файла" << endl
+			<< "read - прочитать в файле" << endl
+			<< "write - записать в файл" << endl
+			<< "chmod - установить права файла" << endl
+			<< "add - создать группу" << endl
+		    << "get - получить список групп" << endl
+		    << "delete - удалить группу" << endl
+		    << "rename - переименовать группу" << endl
+		    << "passwd - сменить пароль группы" << endl
+		    << "leave - выйти из группы" << endl
+		    << "join - присоединиться к группе" << endl
+			<< "clear - очистить консоль" << endl
+		    << "exit - выйти" << endl
+			<< "asdasdas" << endl;
 	};
 }
